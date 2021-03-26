@@ -83,7 +83,7 @@ awk '$4==2' Epos.multiIntersectBed.bed > Epos.bed
 
 
 ####################################################################################################################
-############         3. customised analyses that combines the results of multiple datasets              ############
+############         3. customised analyses that combine the results of multiple datasets              ############
 ####################################################################################################################
 
 ### 1) liftover H3K27ac peaks (potential enhancers) from GEO GSE60192
