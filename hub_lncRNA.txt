@@ -1,5 +1,0 @@
-hub lncRNA
-shortLabel Mouse lncRNA study
-longLabel Mouse lncRNA study
-email q.zhao@uq.edu.au
-descriptionUrl https://github.com/Qiongyi/lncRNA_2020/blob/master/B1_KCl_H3K27ac.mm10.bw
