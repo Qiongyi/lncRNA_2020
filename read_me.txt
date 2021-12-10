@@ -179,3 +179,31 @@ lncRNA_overlay_bed_OnlyExon_transcript_TSS.pl 500 H3K4me1 H3K4ME1_SHC-01H-CA1_B1
 
 # note "Nucleus.lncRNACapture.genomic.ATAC.CBP.H3K27ac.H3K4me1.xls" is the Supplemental Table 1.
 
+
+
+
+####################################################################################################################
+############         4. The overlay analysis: real data vs. random data                                 ############
+####################################################################################################################
+
+# Please note this analysis was performed to address one of the reviewer's question regarding Figure 1B (The venn diagram): “Are these regions more likely to overlap than similar sized genomic regions sampled by chance?”
+
+# To address this question, we randomized the genomic location of same number of “lncRNAs” (with same size and same number of exons), and then performed the exact same overlay analysis with ATAC-Seq, CBP ChIP-Seq, H3K4me1 ChIP-Seq, and H3K27ac ChIP-Seq peaks. We performed the random relocation of lncRNAs three times independently, and identified 32, 39 and 33 “lncRNAs” that overlapped with all four enhancer markers, respectively. These numbers of overlapping "lncRNAs" sampled by chance are dramatically less than 434 overlapping lncRNAs identified in our study. Three random datasets were stored in "random1_lncRNA", "random2_lncRNA" and "random3_lncRNA" folders.
+
+
+### 1) Randomized the genomic location of “lncRNAs”. The script will take real genomic location of lncRNAs from the input file "lncRNA_2109.xls", randomly relocate it to the same chromosome, and generate a new GTF file "lncRNA_random.gtf".
+
+lncRNA_randomize_genomic_location.pl mm10.fasta.fai merged.gtf lncRNA_2109.xls lncRNA_random.gtf
+
+### 2) overlay with ATAC-Seq peaks
+
+lncRNA_overlay_bed_OnlyExon_transcript.pl ATAC_EXTpos /clusterdata/uqqzhao/illumina/202009_Xiang_ATAC_FACS_BredyLab/results_using_all_replicates/supported_by_all_replicates/Epos.removeBlacklist.bed lncRNA_random.gtf lncRNA_2109.xls lncRNA_random.ATAC.xls
+
+### 3) overlay with CBP peaks
+lncRNA_overlay_bed_OnlyExon_transcript_TSS.pl 500 CBP /clusterdata/uqqzhao/reference/Mouse_enhancer_markers/Greenberg_data/GSM530174_CBP_Millipore_KCl_B1_E120_mm10.bed lncRNA_random.gtf lncRNA_random.ATAC.xls lncRNA_random.ATAC.CBP.xls
+
+### 4) overlay with H3K27ac peaks
+lncRNA_overlay_bed_OnlyExon_transcript_TSS.pl 500 H3K27AC /clusterdata/uqqzhao/reference/Mouse_enhancer_markers/Bonn_data/H3K27AC_SHC-01H-CA1_B1B2merged_mm10.bed lncRNA_random.gtf lncRNA_random.ATAC.CBP.xls lncRNA_random.ATAC.CBP.H3K27AC.xls
+
+### 5) overlay with H3K4Me1 peaks
+lncRNA_overlay_bed_OnlyExon_transcript_TSS.pl 500 H3K4ME1 /clusterdata/uqqzhao/reference/Mouse_enhancer_markers/Bonn_data/H3K4ME1_SHC-01H-CA1_B1B2merged_mm10.bed lncRNA_random.gtf lncRNA_random.ATAC.CBP.H3K27AC.xls lncRNA_random.ATAC.CBP.H3K27AC.H3K4ME1.xls
