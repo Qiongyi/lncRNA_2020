@@ -4,12 +4,15 @@
 ####################################################################################################################
 
 ### 1) use cutadapt (v1.17) to clip low-quality nucleotides and adaptor sequences
-# Bases lower than a defined Phred quality threshold (default: 20) at the 3′ end were trimmed off from each read using cutadapt (http://code.google.com/p/cutadapt/). Next, known Illumina primers and adaptor sequences were clipped off from each read by cutadapt, which computes sensitive semi-global alignments of all the reads against all the primer/adaptor sequences, allowing gapped and mismatched alignments.
+# Bases lower than a defined Phred quality threshold (default: 20) at the 3′ end were trimmed off from each read using cutadapt (http://code.google.com/p/cutadapt/). 
+Next, known Illumina primers and adaptor sequences were clipped off from each read by cutadapt, which computes sensitive semi-global alignments of all the reads 
+against all the primer/adaptor sequences, allowing gapped and mismatched alignments.
 
 pipeline_cutadapt.pl sample_info.txt /illumina/Data/others/201912_Wei_Nuclear_LncRNA_CapSeq_BredyLab/ori /illumina/Data/others/201912_Wei_Nuclear_LncRNA_CapSeq_BredyLab/cutadapt
 
 
-### 2) mapping against the mouse genome (mm10) using HISAT2 (v2.1.0); convert “SAM” files to “BAM” files, remove duplicate reads, sort and index the “BAM” files. To avoid the artefact signals potentially introduced by misalignments, we only kept properly PE aligned reads with mapping quality at least 20 for downstream analyses.
+### 2) mapping against the mouse genome (mm10) using HISAT2 (v2.1.0); convert “SAM” files to “BAM” files, remove duplicate reads, sort and index the “BAM” files. 
+To avoid the artefact signals potentially introduced by misalignments, we only kept properly PE aligned reads with mapping quality at least 20 for downstream analyses.
 
 pipeline_alignment.pl hisat2 config.txt /illumina/reference/mm10/HISAT2_index/mm10 ./cutadapt ./HISAT2
 
@@ -186,12 +189,29 @@ lncRNA_overlay_bed_OnlyExon_transcript_TSS.pl 500 H3K4me1 H3K4ME1_SHC-01H-CA1_B1
 ############             4. The overlay analysis: real data vs. random data                             ############
 ####################################################################################################################
 
-# Please note this analysis was performed to address one of the reviewer's question regarding Figure 1B (The Venn diagram): “Are these regions more likely to overlap than similar sized genomic regions sampled by chance?”
+# Please note this analysis was performed to address one of the reviewer's question regarding Figure 1B (The Venn diagram): 
+“Are these regions more likely to overlap than similar sized genomic regions sampled by chance?”
 
-# To address this question, we randomized the genomic location of same number of “lncRNAs” (with same size and same number of exons), and then performed the exact same overlay analysis with ATAC-Seq, CBP ChIP-Seq, H3K4me1 ChIP-Seq, and H3K27ac ChIP-Seq peaks. We performed the random relocation of lncRNAs three times independently, and identified 32, 39 and 33 “lncRNAs” that overlapped with all four enhancer markers, respectively. These numbers of overlapping "lncRNAs" sampled by chance are dramatically less than 434 overlapping lncRNAs identified in our study. Three random datasets were stored in "random1_lncRNA", "random2_lncRNA" and "random3_lncRNA" folders.
+# To address this question, we randomized the genomic location of same number of “lncRNAs” (with same size and same number of exons), and then performed the exact same 
+overlay analysis with ATAC-Seq, CBP ChIP-Seq, H3K4me1 ChIP-Seq, and H3K27ac ChIP-Seq peaks. We performed the random relocation of lncRNAs three times independently, 
+and identified 32, 39 and 33 “lncRNAs” that overlapped with all four enhancer markers, respectively. 
+Three random datasets were stored in "random1_lncRNA", "random2_lncRNA" and "random3_lncRNA" folders.
+
+The reviewer further suggested that "in order to construct a full null distribution of these random samplings against which to compare the observed overlap, 
+many more reiterations of sampling need to be conducted, and the actual resulting distributions and p-values calculated."
+
+We then performed 1,000 permutation tests using the same strategy mentioned above. The highest overlap number from 1,000 permutation tests is 53. Please see
+"distribution_from_1K_permutation_tests.pdf" for the distribution from 1,000 permutation tests, and "permutation.1000" for the numbers of overlap from each iteration.  
+
+Since the overlapping analysis involves the overlay of multiple datasets (ATAC-Seq, CBP ChIP-Seq, H3K4me1 ChIP-Seq, and H3K27ac ChIP-Seq peaks) with the “lncRNA” regions, 
+each iteration takes ~30 mins of the computing time using one big RAM computing node. With the consideration of computational resource and estimated waiting time, 
+we decided to perform 1,000 permutation tests as a benchmark. These numbers of overlapping "lncRNAs" sampled by chance (from 1,000 permutation tests) are significantly 
+less than 434 overlapping lncRNAs identified in our study (P < 0.001).
 
 
-### 1) Randomized the genomic location of “lncRNAs”. The script will take real genomic location of lncRNAs from the input file "lncRNA_2109.xls", randomly relocate it to the same chromosome, and generate a new GTF file "lncRNA_random.gtf".
+
+### 1) Randomized the genomic location of “lncRNAs”. The script will take real genomic location of lncRNAs from the input file "lncRNA_2109.xls", randomly relocate it
+to the same chromosome, and generate a new GTF file "lncRNA_random.gtf".
 
 lncRNA_randomize_genomic_location.pl mm10.fasta.fai merged.gtf lncRNA_2109.xls lncRNA_random.gtf
 
